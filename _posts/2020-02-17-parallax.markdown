@@ -1,0 +1,43 @@
+---
+layout: post
+title:  "Parallax in 2D Platformer"
+date:   2020-01-15 22:55:36 -0500
+categories: blue parallax
+---
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$']]
+      }
+    });
+  </script>
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+    type="text/javascript"></script>
+
+Though Project Blue is going to be a 2D platformer, it is good to have the parallax effect that makes the scene looks as if it has depth.
+
+<div style="width:100%;height:0px;position:relative;padding-bottom:60%;"><iframe src="https://streamable.com/s/4anhx/jqbtem" frameborder="0" width="100%" height="100%" allowfullscreen style="width:100%;height:100%;position:absolute;left:0px;top:0px;overflow:hidden;"></iframe></div>
+
+# Implementation
+The parallax effect is made as a component attached to the background object.
+The background is divided into separated layers, each of which represents a layer of depth.
+Since we are using an ortho camera in this project, the $z$ axis value of an object does not affect the object's projection on the screen, but it does determine the order of covering each other, which makes it most suitable for annotating the depth.
+
+In principle, the further a layer is, the less it moves related to the camera.
+Let the camera translate be a vector $\vec{x}$, the background translate should be multiplied by a factor depending on its depth (following factor), i.e., $\eta(z) \cdot \vec{x}$.
+Here, how to choose $\eta(z)$ is a problem.
+It's trivial that for the nearest layer, $\eta = 0$, and for the furthest layer, $\eta = 1$.
+I tried two different approaches.
+- Restrict $z$ to be in the range of $[0, 1]$ and let $\eta(z) = z$.
+  This is simple, but here the $z$ value is no longer linear to the actual distance of the layer from the camera, which is not intuitive for the level designers to tweak.
+- Borrow it from perspective projection.
+  In simplified perspective projection, let $e$ be the distance of the near plane (screen surface) from the camera, $\theta$ be the field of view, and $z$ be that of a point in 3D space, the scaling factor is $\frac{e}{\tan\theta \cdot z}$.
+  Using it here, we have $\eta(z) = 1 - \frac{e}{\tan\frac{\theta}{2} \cdot z}$.
+
+I finally chose the second option and in code, I pick $e = 1$ and $\tan\frac{\theta}{2} = 1$ for convenience.
+
+# Improvements
+Having the above is enough for the parallax effect, but it could be more juicy if it translates smoothly.
+Instead of directly moving the layer to $\eta(z) \cdot \vec{x}$, I set it as a target and in each frame I stepped using linear interpolation towards it.
+The asymptotic behavior is that the layer exponentially approaches the target, making a soft transition.
