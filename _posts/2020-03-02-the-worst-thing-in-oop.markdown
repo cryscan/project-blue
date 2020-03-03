@@ -45,7 +45,7 @@ Then the receiver of `OnApplyDamage` event is set to `Health.ApplyDamage` method
 
 Another feature of the system is to relocate the player after touching the hazards (but not normal enemy attacks).
 I found it actually does the same as `TakeDamage` so I wrote the logic in it too.
-For more information on player relocation and re-spawning, I have another post on that stuff.
+For more information on player relocation and re-spawning, I have [another post]({% post_url 2020-03-02-player-controller %}) on that stuff.
 
 This implementation was rejected by Max.
 He said that it's better to separate the code by behaviors
