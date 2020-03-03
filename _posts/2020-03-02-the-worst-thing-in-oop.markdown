@@ -87,7 +87,7 @@ public DamageEvent onApplyDamage;
 public RelocateEvent OnRelocate;
 ```
 
-## What if using ECS
+## What If Using ECS
 If Entity-Component-System was used in the project, the asymmetricity would disappear.
 It's because Systems are independent from any Entities: it just queries Components and manipulates them.
 We can program one process regarding to distinct Entities in exactly one System.
@@ -156,6 +156,6 @@ Games are so complicated softwares that any variable concealed in a class has th
 Concealing data may not lead to safety, but a mess.
 I am willing to share my thought on this topic in later posts.
 
-## What To Do Now
+## About Project Blue
 It is certainly impossible for us to switch the paradigm of the project and it is inevitable to make one thing happen in different places.
 I think what we should do now is to set up our coding convention and to stick on it.
