@@ -109,6 +109,7 @@ This is because the code for level transition is in somewhere else (oh this prob
 Later I will refactor level transition code so that the whole process happens together.
 
 # Time Breakdown
+
 | Title        | Hours | Description                                                 |
 | :----------- | ----: | :---------------------------------------------------------- |
 | Game Manager |     1 | Set up the `GameManager` singleton class                    |
@@ -117,4 +118,4 @@ Later I will refactor level transition code so that the whole process happens to
 | Save         |     1 | Learn how to serialize data and write into file             |
 |              |     4 | Implement save system (tried several implementations)       |
 | Load         |     2 | Implement scene loading                                     |
-|              |     2 | Fix scene resetting bug                                     |
+|              |     2 | Fix scene resetting                                         |
