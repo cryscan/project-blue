@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "The Worst Thing in OOP"
-categories: blue parallax
+categories: blue programming
 ---
 
 The worst thing in OOP is that everything just happens elsewhere, I am always repeating this sentence these days.

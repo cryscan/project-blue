@@ -1,0 +1,135 @@
+---
+layout: post
+title:  "Level Manager and Auto Saving"
+categories: blue system
+---
+
+<div style="width:100%;height:0px;position:relative;padding-bottom:60%;"><iframe src="https://streamable.com/e/c74c0h" frameborder="0" width="100%" height="100%" allowfullscreen style="width:100%;height:100%;position:absolute;left:0px;top:0px;overflow:hidden;"></iframe></div>
+
+## Level Manager
+In last sprint the save/load system is almost done, but the level transition is not triggered after loading the scene.
+So in [this video](https://streamable.com/nasq7), after reloading the scene in the second level, the player is correctly reset but the camera is not.
+In order to transit to the right level in a scene after loading, I did a total refactor on the Level Manager.
+
+# Singleton
+The first thing is to find the Level Manager in the scene.
+Unlike the Game Manager, the Level Manager is not attached to a Don't Destroy on Load object.
+It is a component attached to the level zone in each scene.
+The previous way of getting the reference is to:
+1. Find the game object with tag `Zone`
+2. Get the `LevelManager` component from the object
+
+However there is no guarantee that
+1. The level zone is tagged `Zone`
+2. No other single object is tagged `Zone`
+3. Zone has the Level Manager attached
+
+To make the system more robust, I changed the Level Manager to a singleton.
+Unlike Game Manager, which destroys the duplicated instance, the Level Manager overrides the old instance when a new one is instantiated.
+```c#
+// class LevelManager
+
+public static LevelManager Instance { get; private set; }
+
+private void Awake()
+{
+    if (Instance == null || Instance != this)
+        Instance = this;
+}
+```
+
+Then it is easy to get the current available Level Manager via `LevelManager.Instance`.
+
+# Camera Priorities
+In one scene, there are multiple levels. In each level there is a virtual camera which governs the track of view.
+By resetting the priorities of the virtual cameras, Cinemachine will automatically interpolate the level transition.
+
+Previously this piece of login was attached to the triggers between two levels.
+What they did was to swap the priorities of the cameras of both sides.
+This implementation increases duplication of codes and makes it impossible to globally set one camera as the highest priority.
+
+The refactor I did was basically putting all level transition logics into the Level Manager.
+When a trigger detects level transition, it sends an event to the Level Manager instead of handling by itself.
+
+On the Level Manager's side, to make sure that the most recent used camera gets the highest priority, a self-increasing counter is used.
+One potential pitfall here is that the counter may overflow.
+The solution to this is that once overflow is detected, all cameras' priority is set to zero.
+```c#
+// class LevelManager
+
+// Caution: may overflow.
+private int cameraPriority = 0;
+
+/// <summary>
+/// Set both currentLevel and currentSpawnPoint.
+/// Used in level transition.
+/// </summary>
+public void DoLevelTransition(GameObject level, Transform spawnPoint)
+{
+    _currentLevel = level;
+    _currentRespawnPoint = spawnPoint;
+    ResetCameraPriority();
+    GameManager.SaveLoad.Save();
+}
+
+/// <summary>
+/// Reset currentRelocationPoint to currentRespawnPoint's position.
+/// Used when player dead.
+/// </summary>
+public void ResetRelocationPoint()
+{
+    _currentRelocationPoint.position = _currentRespawnPoint.position;
+}
+
+
+public void ResetCameraPriority()
+{
+    // Detect overflow.
+    if (cameraPriority <= 0)
+    {
+        cameraPriority = 0;
+        var cameras = GetComponentsInChildren<Cinemachine.CinemachineVirtualCamera>();
+        foreach (var cam in cameras)
+            cam.Priority = 0;
+    }
+
+    var camera = _currentLevel.GetComponentInChildren<Cinemachine.CinemachineVirtualCamera>();
+    if (camera)
+        camera.Priority = ++cameraPriority;
+}
+```
+
+## Auto Saving
+After completing the save/load system, it is time to utilize it.
+Since there is only one saving slot in the game, it is dumb to let the player save progress manually.
+
+Another place where the system is useful is that to reset the whole map (including fallen stalactites and dead enemies).
+It is very tedious to implement and call `Reset()` on every object.
+Here reloading the scene it the easiest and most effective way.
+
+The auto saving in project blue is very straightforward.
+A save action is triggered when:
+- Player dead
+- Level transition is detected
+Fortunately these are exposed as public events on related objects, so I set up auto saving quickly.
+
+In terms of auto loading, it does not make sense that having a `continue' button at the first time one plays the game.
+What I have done is to leave a public interface returning whether the saving file exists.
+The other work relating to UI is left to other PODs.
+This part is also very easy.
+
+## Testing and Debugging
+The rest of time of these two weeks is used in testing and tweaking the level transition mechanism, which includes:
+1. How long the player should freezes before relocating after touching hazards
+2. How to deal with the WWise error after reloading the scene (Max finally fixed it)
+
+## Time Breakdown
+
+| Title         | Hours | Description                                  |
+| :------------ | ----: | :------------------------------------------- |
+| Level Manager |     1 | Set up the `LevelManager` singleton class    |
+|               |     2 | Correctly set the camera priorities          |
+| Auto Saving   |     2 | Configure the level to support auto saving   |
+| Testing       |     1 | Make the testing map                         |
+|               |     1 | Fix the potential bug on counter overflowing |
+| Discussion    |     4 | Studio meetings and POD meetings             |

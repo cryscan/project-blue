@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Game Manager and Save/Load System"
-categories: blue parallax
+categories: blue system
 ---
 
 <div style="width:100%;height:0px;position:relative;padding-bottom:60%;"><iframe src="https://streamable.com/s/nasq7/hotkax" frameborder="0" width="100%" height="100%" allowfullscreen style="width:100%;height:100%;position:absolute;left:0px;top:0px;overflow:hidden;"></iframe></div>
