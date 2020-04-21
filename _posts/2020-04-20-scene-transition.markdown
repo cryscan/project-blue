@@ -43,3 +43,24 @@ Time limited, I had to make an ad-hoc fix: initialize camera's update method to 
 
 # Play Testing
 In the last week I spend one hour everyday doing nothing but play testing the game.
+Most bugs I found were solved in a week.
+
+<div style="width:100%;height:0px;position:relative;padding-bottom:60%;"><iframe src="https://streamable.com/e/ez99br?loop=0" frameborder="0" width="100%" height="100%" allowfullscreen style="width:100%;height:100%;position:absolute;left:0px;top:0px;overflow:hidden;"></iframe></div>
+
+The stalactite does not fall.
+
+<div style="width:100%;height:0px;position:relative;padding-bottom:60%;"><iframe src="https://streamable.com/e/1szds5?loop=0" frameborder="0" width="100%" height="100%" allowfullscreen style="width:100%;height:100%;position:absolute;left:0px;top:0px;overflow:hidden;"></iframe></div>
+
+A controller bug.
+I am the coauthor of the player controller in this game.
+The player controller actually contains lots of spaghetti methods and coroutines.
+If there are something I can do in summer, I think is to refactor the controller into a state machine and do some research in animation generation or adaptive animation.
+
+# Time Breakup
+
+| Title            | Hours | Description |
+| :--------------- | ----: | :---------- |
+| Scene Transition |     3 |             |
+| Parallax Glitch  |     1 |             |
+| Play Testing     |     6 |             |
+| Discussion       |     4 |             |
