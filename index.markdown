@@ -6,4 +6,4 @@ layout: home
 ---
 A 2D action platformer in which player can teleport to their thrown weapon.
 
-![blue](assets/io_promo_3-01.png)
+[![blue](assets/io_promo_3-01.png)](https://wolverinesoft-studio.itch.io/io)
